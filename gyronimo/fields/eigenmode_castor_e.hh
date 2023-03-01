@@ -1,6 +1,6 @@
 // ::gyronimo:: - gyromotion for the people, by the people -
 // An object-oriented library for gyromotion applications in plasma physics.
-// Copyright (C) 2021 Paulo Rodrigues.
+// Copyright (C) 2021-2023 Paulo Rodrigues.
 
 // ::gyronimo:: is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ class eigenmode_castor_e : public IR3field {
       const parser_castor *p, const metric_helena *g,
       const interpolator1d_factory* ifactory)
       : IR3field(m_factor, t_factor, g),
-        iw_(-p->w_imag(), p->w_real()),
+        iw_(-p->eigenvalue_imag(), p->eigenvalue_real()),
         A_(m_factor*t_factor, t_factor, p, g, ifactory) {};
   virtual ~eigenmode_castor_e() override {};
 
