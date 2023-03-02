@@ -32,9 +32,20 @@ eigenmode_castor_a::eigenmode_castor_a(
       tildeA1_(p->s(), p->a1_real(), p->a1_imag(), p->m(), ifactory),
       tildeA2_(p->s(), p->a2_real(), p->a2_imag(), p->m(), ifactory),
       tildeA3_(p->s(), p->a3_real(), p->a3_imag(), p->m(), ifactory) {
-  norm_factor_ = 1.0/std::ranges::max(
-      parser_->s() | std::views::transform(
-          [this](double s){return this->magnitude({s, 0, 0}, 0);}));
+  using namespace std;
+  auto max_magnitude_at_radius = [this](double s) {
+    auto highest_harmonic = ranges::max(views::transform(
+        this->parser_->m(), [](auto m) {return abs(m);}));
+    size_t chi_range_size = (size_t)(8*highest_harmonic);
+    double delta_chi = 2*numbers::pi/chi_range_size;
+    auto chi_range = views::transform(
+        views::iota(0u, chi_range_size), bind_front(multiplies{}, delta_chi));
+    return ranges::max(views::transform(
+        chi_range,
+        [this, s](double chi){return this->magnitude({s, chi, 0}, 0);}));
+  };
+  norm_factor_ = 1.0/ranges::max(
+      views::transform(parser_->s(), max_magnitude_at_radius));
 }
 IR3 eigenmode_castor_a::covariant(const IR3& position, double time) const {
   double s = position[IR3::u];
